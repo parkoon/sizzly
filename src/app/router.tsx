@@ -4,24 +4,36 @@ import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 
 import { paths } from '@/config/paths'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const convert = (queryClient: QueryClient) => (m: any) => {
-  const { clientLoader, clientAction, default: Component, ...rest } = m
-  return {
-    ...rest,
-    loader: clientLoader?.(queryClient),
-    action: clientAction?.(queryClient),
-    Component,
-  }
-}
+import { convert } from '@/lib/route'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const createAppRouter = (queryClient: QueryClient) =>
   createBrowserRouter([
     {
-      path: paths.home.path,
-      lazy: () => import('./pages/home').then(convert(queryClient)),
+      path: paths.home.root.path,
+      lazy: () => import('./pages/home/layout').then(convert(queryClient)),
+      children: [
+        {
+          index: true,
+          lazy: () => import('./pages/home').then(convert(queryClient)),
+        },
+        {
+          path: paths.home.profile.path,
+          lazy: () => import('./pages/home/profile').then(convert(queryClient)),
+        },
+        {
+          path: paths.home.likes.path,
+          lazy: () => import('./pages/home/likes').then(convert(queryClient)),
+        },
+        {
+          path: paths.home.shop.path,
+          lazy: () => import('./pages/home/shop').then(convert(queryClient)),
+        },
+        {
+          path: paths.home.data.path,
+          lazy: () => import('./pages/home/data').then(convert(queryClient)),
+        },
+      ],
     },
     {
       path: paths.watch.path,

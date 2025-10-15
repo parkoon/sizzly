@@ -1,7 +1,25 @@
 export const paths = {
   home: {
-    path: '/',
-    getHref: () => '/',
+    root: {
+      path: '/',
+      getHref: () => '/',
+    },
+    profile: {
+      path: '/profile',
+      getHref: () => '/profile',
+    },
+    likes: {
+      path: '/likes',
+      getHref: () => '/likes',
+    },
+    shop: {
+      path: '/shop',
+      getHref: () => '/shop',
+    },
+    data: {
+      path: '/data',
+      getHref: () => '/data',
+    },
   },
   watch: {
     path: '/watch/:videoId',

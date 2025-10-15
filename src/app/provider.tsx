@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { PostHogProvider } from 'posthog-js/react'
 import * as React from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { HelmetProvider } from 'react-helmet-async'
@@ -8,7 +7,6 @@ import { Toaster } from 'sonner'
 import { GlobalModal } from '@/components/global-modal'
 import { Spinner } from '@/components/ui/spinner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { env } from '@/config/env'
 import { queryConfig } from '@/lib/react-query'
 
 type AppProviderProps = {
@@ -49,18 +47,18 @@ export const AppProvider = ({ children }: AppProviderProps) => {
                 },
               }}
             />
-            <PostHogProvider
+            {/* <PostHogProvider
               apiKey={env.POSTHOG_KEY}
               options={{
                 api_host: env.POSTHOG_HOST,
                 defaults: '2025-05-24',
               }}
-            >
-              <TooltipProvider>
-                {children}
-                <GlobalModal />
-              </TooltipProvider>
-            </PostHogProvider>
+            > */}
+            <TooltipProvider>
+              {children}
+              <GlobalModal />
+            </TooltipProvider>
+            {/* </PostHogProvider> */}
           </QueryClientProvider>
         </HelmetProvider>
       </ErrorBoundary>

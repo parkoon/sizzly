@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import ringSound from '@/assets/ring.mp3'
-import { Page, PageAppBarWithBack, PageContent } from '@/components/layout/page'
+import { PageAppBarWithBack, PageContent, PageLayout } from '@/components/layouts/page'
 import { SaveSubtitleButton, type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
 import { VideoController, type VideoControllerRef } from '@/components/video-controller'
 import { VideoSubtitles } from '@/components/video-subtitles'
@@ -252,19 +252,19 @@ const WatchPage = () => {
 
   if (isLoadingDialogues) {
     return (
-      <Page>
+      <PageLayout>
         <PageAppBarWithBack title="Chọn câu thoại để lưu" />
         <PageContent>
           <div className="flex items-center justify-center h-full">
             <div className="text-center">Đang tải phụ đề...</div>
           </div>
         </PageContent>
-      </Page>
+      </PageLayout>
     )
   }
 
   return (
-    <Page>
+    <PageLayout>
       <PageAppBarWithBack title="Chọn câu thoại để lưu" />
 
       {/* <Button
@@ -304,7 +304,7 @@ const WatchPage = () => {
           toggleRepeat={handleToggleRepeat}
         />
       </PageContent>
-    </Page>
+    </PageLayout>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { Page, PageAppBarWithBack, PageContent } from '@/components/layout/page'
+import { PageLayout, PageAppBarWithBack, PageContent } from '@/components/layouts/page'
 import { SavedSubtitleCard } from '@/components/saved-subtitle-card'
 import { useIsSentenceUpdated } from '@/stores/is-sentence-updated-store'
 import { useSavedSubtitlesStore } from '@/stores/saved-subtitles-store'
@@ -14,7 +14,7 @@ const MySentencesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (
-    <Page>
+    <PageLayout>
       <PageAppBarWithBack title="Câu của tôi" />
       <PageContent>
         {savedSubtitles.length === 0 ? (
@@ -30,7 +30,7 @@ const MySentencesPage = () => {
           </div>
         )}
       </PageContent>
-    </Page>
+    </PageLayout>
   )
 }
 

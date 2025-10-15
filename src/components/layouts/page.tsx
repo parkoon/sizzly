@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router'
 import { APP_BAR_HEIGHT, MAX_MOBILE_SCREEN_WIDTH } from '@/config/app'
 import { cn } from '@/lib/utils'
 
-export const Page = ({ children }: { children: React.ReactNode }) => {
+export const PageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       style={{ maxWidth: MAX_MOBILE_SCREEN_WIDTH }}
