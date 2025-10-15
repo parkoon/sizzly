@@ -1,13 +1,13 @@
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useNavigate } from 'react-router'
 
-import { APP_BAR_HEIGHT, MAX_MOBILE_SCREEN_WIDTH } from '@/config/app'
+import { APP_BAR_HEIGHT, MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { cn } from '@/lib/utils'
 
 export const PageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
-      style={{ maxWidth: MAX_MOBILE_SCREEN_WIDTH }}
+      style={{ maxWidth: MAX_APP_SCREEN_WIDTH }}
       className="min-h-screen mx-auto flex flex-col items-stretch"
     >
       {children}
@@ -26,7 +26,7 @@ const PageAppBarWrapper = ({ children, className }: PageAppBarWrapperProps) => {
         'sticky w-full top-0 left-0 right-0 bg-white z-50 flex items-center px-4',
         className,
       )}
-      style={{ maxWidth: MAX_MOBILE_SCREEN_WIDTH, margin: '0 auto', height: APP_BAR_HEIGHT }}
+      style={{ maxWidth: MAX_APP_SCREEN_WIDTH, margin: '0 auto', height: APP_BAR_HEIGHT }}
     >
       {children}
     </header>

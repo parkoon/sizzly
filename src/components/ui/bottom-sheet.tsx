@@ -4,7 +4,7 @@ import { IconX } from '@tabler/icons-react'
 import React from 'react'
 import { Drawer } from 'vaul'
 
-import { MAX_MOBILE_SCREEN_WIDTH } from '@/config/app'
+import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { cn } from '@/lib/utils'
 
 type BottomSheetProps = {
@@ -42,7 +42,7 @@ export const BottomSheet = ({
           )}
           style={{
             height,
-            maxWidth: MAX_MOBILE_SCREEN_WIDTH - GUTTER * 2,
+            maxWidth: MAX_APP_SCREEN_WIDTH - GUTTER * 2,
             width: `calc(100% - ${GUTTER * 2}px)`,
             paddingInline: GUTTER,
             bottom: GUTTER,
