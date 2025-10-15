@@ -1,5 +1,5 @@
 const Profile = () => (
-  <div className="flex-1 bg-gradient-to-b from-blue-50 to-white p-4 pb-20 animate-fadeIn">
+  <div>
     <div className="bg-white rounded-2xl shadow-sm p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Profile</h1>
       <div className="flex items-center gap-4 mb-6">

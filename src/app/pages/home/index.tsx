@@ -2,7 +2,7 @@ import { IconHeart, IconUsers } from '@tabler/icons-react'
 
 const Dashboard = () => {
   return (
-    <div className="flex-1 bg-gradient-to-b from-purple-50 to-white p-4 pb-20 animate-fadeIn">
+    <div>
       <div className="bg-white rounded-2xl shadow-sm p-4 mb-4">
         <h1 className="text-gray-600 text-center mb-4">Dashboard</h1>
 

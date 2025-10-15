@@ -1,5 +1,5 @@
 const Shop = () => (
-  <div className="flex-1 bg-gradient-to-b from-green-50 to-white p-4 pb-20 animate-fadeIn">
+  <div>
     <div className="bg-white rounded-2xl shadow-sm p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Shop</h1>
       <div className="grid grid-cols-2 gap-4">

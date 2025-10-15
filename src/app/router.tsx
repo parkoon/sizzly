@@ -11,7 +11,7 @@ export const createAppRouter = (queryClient: QueryClient) =>
   createBrowserRouter([
     {
       path: paths.home.root.path,
-      lazy: () => import('./pages/home/layout').then(convert(queryClient)),
+      lazy: () => import('../components/layouts/tab-layout').then(convert(queryClient)),
       children: [
         {
           index: true,
