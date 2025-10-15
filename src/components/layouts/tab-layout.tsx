@@ -60,7 +60,7 @@ const TabLayout = () => {
           </button>
         </div>
       </header>
-      <div className="flex-1 pb-20 pt-4 tab-in">
+      <div className="flex-1 pb-20 tab-in">
         <Outlet />
       </div>
       <div
@@ -75,7 +75,7 @@ const TabLayout = () => {
               className={({ isActive }) =>
                 cn(
                   `flex flex-col items-center justify-center h-full w-full transition-all`,
-                  isActive ? 'text-orange-600' : 'text-gray-600',
+                  isActive ? 'text-gray-900' : 'text-gray-600',
                 )
               }
             >
