@@ -1,52 +1,37 @@
 import {
-  IconChartArcs,
-  IconDatabase,
-  IconHeart,
-  IconShoppingBag,
-  IconUsers,
+  IconBookmark,
+  IconBookmarkFilled,
+  IconBrandYoutube,
+  IconBrandYoutubeFilled,
 } from '@tabler/icons-react'
 import { type FC } from 'react'
 import { NavLink, Outlet } from 'react-router'
 
 import { paths } from '@/config/paths'
+import { cn } from '@/lib/utils'
 
 type TabItem = {
   id: string
   label: string
   icon: FC<{ className?: string }>
+  iconFilled: FC<{ className?: string }>
   path: string
 }
 
 const TAB_ITEMS: TabItem[] = [
   {
     id: 'stats',
-    label: 'Stats',
-    icon: IconChartArcs,
+    label: '영상',
+    icon: IconBrandYoutube,
+    iconFilled: IconBrandYoutubeFilled,
     path: paths.home.root.getHref(),
   },
   {
-    id: 'profile',
-    label: 'Profile',
-    icon: IconUsers,
-    path: paths.home.profile.getHref(),
-  },
-  {
-    id: 'likes',
-    label: 'Likes',
-    icon: IconHeart,
-    path: paths.home.likes.getHref(),
-  },
-  {
-    id: 'shop',
-    label: 'Shop',
-    icon: IconShoppingBag,
-    path: paths.home.shop.getHref(),
-  },
-  {
-    id: 'data',
-    label: 'Data',
-    icon: IconDatabase,
-    path: paths.home.data.getHref(),
+    id: 'bookmarks',
+    label: '찜',
+    icon: IconBookmark,
+    iconFilled: IconBookmarkFilled,
+    path: paths.home.bookmarks.getHref(),
   },
 ]
 
@@ -57,24 +42,29 @@ const TabLayout = () => {
         <Outlet />
       </div>
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="flex justify-around items-center h-16 px-4">
-          {TAB_ITEMS.map(tab => {
-            const Icon = tab.icon
-            return (
-              <NavLink
-                key={tab.id}
-                to={tab.path}
-                className={({ isActive }) =>
-                  `flex flex-col items-center justify-center p-2 rounded-lg transition-all ${
-                    isActive ? 'text-purple-600 scale-105' : 'text-gray-400 hover:text-gray-600'
-                  }`
-                }
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs mt-1">{tab.label}</span>
-              </NavLink>
-            )
-          })}
+        <div className="flex justify-around items-center h-14 px-4">
+          {TAB_ITEMS.map(tab => (
+            <NavLink
+              key={tab.id}
+              to={tab.path}
+              className={({ isActive }) =>
+                cn(
+                  `flex flex-col items-center justify-center h-full w-full transition-all`,
+                  isActive ? 'text-purple-600' : 'text-gray-600',
+                )
+              }
+            >
+              {({ isActive }) => {
+                const Icon = isActive ? tab.iconFilled : tab.icon
+                return (
+                  <>
+                    <Icon className="w-6 h-6" />
+                    <span className="text-xs mt-1 font-semibold">{tab.label}</span>
+                  </>
+                )
+              }}
+            </NavLink>
+          ))}
         </div>
       </div>
     </div>

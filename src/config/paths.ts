@@ -4,21 +4,9 @@ export const paths = {
       path: '/',
       getHref: () => '/',
     },
-    profile: {
-      path: '/profile',
-      getHref: () => '/profile',
-    },
-    likes: {
-      path: '/likes',
-      getHref: () => '/likes',
-    },
-    shop: {
-      path: '/shop',
-      getHref: () => '/shop',
-    },
-    data: {
-      path: '/data',
-      getHref: () => '/data',
+    bookmarks: {
+      path: '/bookmarks',
+      getHref: () => '/bookmarks',
     },
   },
   watch: {

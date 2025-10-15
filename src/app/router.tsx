@@ -18,20 +18,8 @@ export const createAppRouter = (queryClient: QueryClient) =>
           lazy: () => import('./pages/home').then(convert(queryClient)),
         },
         {
-          path: paths.home.profile.path,
-          lazy: () => import('./pages/home/profile').then(convert(queryClient)),
-        },
-        {
-          path: paths.home.likes.path,
-          lazy: () => import('./pages/home/likes').then(convert(queryClient)),
-        },
-        {
-          path: paths.home.shop.path,
-          lazy: () => import('./pages/home/shop').then(convert(queryClient)),
-        },
-        {
-          path: paths.home.data.path,
-          lazy: () => import('./pages/home/data').then(convert(queryClient)),
+          path: paths.home.bookmarks.path,
+          lazy: () => import('./pages/home/bookmarks').then(convert(queryClient)),
         },
       ],
     },
