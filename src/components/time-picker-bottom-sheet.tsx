@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { BottomSheet } from './ui/bottom-sheet'
 import { Button } from './ui/button'
@@ -21,6 +21,14 @@ export const TimePickerBottomSheet = ({
 }: TimePickerBottomSheetProps) => {
   const [selectedMinutes, setSelectedMinutes] = useState(initialMinutes)
   const [selectedSeconds, setSelectedSeconds] = useState(initialSeconds)
+
+  // 바텀시트가 열릴 때마다 초기값으로 리셋
+  useEffect(() => {
+    if (open) {
+      setSelectedMinutes(initialMinutes)
+      setSelectedSeconds(initialSeconds)
+    }
+  }, [open, initialMinutes, initialSeconds])
 
   const handleMinutesChange = (value: number) => {
     setSelectedMinutes(value)
