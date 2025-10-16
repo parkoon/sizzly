@@ -55,10 +55,8 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
             >
               <div
                 className={cn(
-                  'bg-white p-4 shadow-sm transition-all duration-300 cursor-pointer',
-                  isActive
-                    ? 'scale-100 opacity-100 shadow-md'
-                    : 'scale-95 opacity-50 hover:opacity-70',
+                  'bg-white p-4 transition-all border rounded border-gray-300 duration-300 cursor-pointer',
+                  isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-50',
                 )}
               >
                 <div className="flex items-center justify-between mb-2">

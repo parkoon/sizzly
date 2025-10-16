@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import { PageAppBarWithBack, PageContent, PageLayout } from '@/components/layouts/page'
-import { SaveSubtitleButton, type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
-import { VideoController, type VideoControllerRef } from '@/components/video-controller'
-import { VideoSubtitles } from '@/components/video-subtitles'
-import { defaultSubtitles, getDialogue } from '@/data/dialogue'
+import { type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
+import { type VideoControllerRef } from '@/components/video-controller'
+import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
+import { defaultSubtitles } from '@/data/dialogue'
 import { SubtitleCarousel } from '@/features/video/components/subtitle-carousel'
 import { YouTubePlayer, type YouTubePlayerRef } from '@/features/video/components/youtube-player'
 import type { Subtitle } from '@/features/video/types'
@@ -238,9 +238,10 @@ const VideoPage = () => {
   }
 
   return (
-    <PageLayout>
-      <PageAppBarWithBack title="Chọn câu thoại để lưu" />
-
+    <div
+      className="min-h-screen flex flex-col mx-auto bg-amber-50-50"
+      style={{ maxWidth: MAX_APP_SCREEN_WIDTH }}
+    >
       {/* <Button
         onClick={() => {
           playerRef.current?.seekTo(1047)
@@ -248,47 +249,45 @@ const VideoPage = () => {
       >
         zz
       </Button> */}
-      <PageContent noSidePadding>
-        <YouTubePlayer
-          onStateChange={handleStateChange}
-          ref={playerRef}
-          videoId={videoId}
-          initialTime={0}
-        />
+      <YouTubePlayer
+        onStateChange={handleStateChange}
+        ref={playerRef}
+        videoId={videoId}
+        initialTime={0}
+      />
 
-        {/* 자막 담기 버튼 */}
+      {/* 자막 담기 버튼 */}
 
-        {/* <SaveSubtitleButton
+      {/* <SaveSubtitleButton
           ref={saveButtonRef}
           onClick={handleSaveSubtitle}
           isSaved={isSaved}
           showTooltip={isFirstSaveDialogue}
         /> */}
 
-        {/* 자막 캐러셀 */}
-        {subtitles.length > 0 && (
-          <div className="mt-4">
-            <SubtitleCarousel
-              subtitles={subtitles}
-              currentIndex={subtitles.findIndex(s => s.index === currentDialogue?.index)}
-              onSelect={index => {
-                const selected = subtitles[index]
-                setCurrentDialogue(selected)
-                playerRef.current?.seekTo(selected.startTime)
-              }}
-            />
-          </div>
-        )}
+      {/* 자막 캐러셀 */}
+      {subtitles.length > 0 && (
+        <div className="mt-4">
+          <SubtitleCarousel
+            subtitles={subtitles}
+            currentIndex={subtitles.findIndex(s => s.index === currentDialogue?.index)}
+            onSelect={index => {
+              const selected = subtitles[index]
+              setCurrentDialogue(selected)
+              playerRef.current?.seekTo(selected.startTime)
+            }}
+          />
+        </div>
+      )}
 
-        <VideoController
+      {/* <VideoController
           ref={videoControllerRef}
           isPlaying={playerState === 1}
           togglePlay={handleTogglePlay}
           onPrevious={handlePrevious}
           onNext={handleNext}
-        />
-      </PageContent>
-    </PageLayout>
+        /> */}
+    </div>
   )
 }
 
