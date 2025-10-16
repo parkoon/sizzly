@@ -8,6 +8,7 @@ import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { cn } from '@/lib/utils'
 
 type BottomSheetProps = {
+  title?: React.ReactNode
   className?: string
   children?: React.ReactNode
   open?: boolean
@@ -18,11 +19,10 @@ type BottomSheetProps = {
   onClose?(): void
 }
 
-const GUTTER = 16
-
 export const BottomSheet = ({
-  className,
+  title,
   open,
+  className,
   children,
   onClose,
   height = 'fit-content',
@@ -30,6 +30,7 @@ export const BottomSheet = ({
   maskClosable = true,
   dismissible = true,
 }: BottomSheetProps) => {
+  const showHeader = title || !hideCloseButton
   return (
     <Drawer.Root open={open} onClose={onClose} noBodyStyles dismissible={dismissible}>
       <Drawer.Portal>
@@ -39,28 +40,29 @@ export const BottomSheet = ({
         />
         <Drawer.Content
           className={cn(
-            'scrollbar-hide nb-shadow fixed inset-x-0 z-50 mx-auto mt-24 h-[50%] overflow-hidden rounded bg-white p-4 outline-none',
+            'scrollbar-hide nb-shadow fixed inset-x-0 z-50 mx-auto mt-24 h-[50%] overflow-hidden rounded-t-2xl  bg-white p-4 outline-none',
             className,
           )}
           style={{
             height,
-            maxWidth: MAX_APP_SCREEN_WIDTH - GUTTER * 2,
-            width: `calc(100% - ${GUTTER * 2}px)`,
-            paddingInline: GUTTER,
-            bottom: GUTTER,
+            maxWidth: MAX_APP_SCREEN_WIDTH,
+            bottom: 0,
           }}
         >
-          <div className={cn('mx-auto w-full overflow-scroll pt-10', hideCloseButton && 'pt-0')}>
-            {children}
-          </div>
-
-          {!hideCloseButton && (
-            <div className="absolute top-4 right-4">
-              <button onClick={onClose}>
-                <IconX />
-              </button>
+          {showHeader && (
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold">{title}</h2>
+              {!hideCloseButton && (
+                <button onClick={onClose}>
+                  <IconX className="w-5 h-5" />
+                </button>
+              )}
             </div>
           )}
+
+          <div className={cn('mx-auto w-full overflow-scroll', showHeader && 'mt-6')}>
+            {children}
+          </div>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

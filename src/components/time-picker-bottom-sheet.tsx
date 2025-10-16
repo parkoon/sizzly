@@ -49,7 +49,7 @@ export const TimePickerBottomSheet = ({
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} dismissible={false} hideCloseButton>
+    <BottomSheet open={open} onClose={onClose} title="타이머 설정" dismissible={false}>
       <TimePicker
         initialMinutes={selectedMinutes}
         initialSeconds={selectedSeconds}
@@ -58,9 +58,6 @@ export const TimePickerBottomSheet = ({
       />
 
       <div className="mt-8 flex gap-2">
-        <Button variant="outline" onClick={onClose} className="flex-1">
-          취소
-        </Button>
         <Button onClick={handleConfirm} className="flex-1">
           시작
         </Button>

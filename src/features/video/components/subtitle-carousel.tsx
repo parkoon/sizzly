@@ -1,3 +1,4 @@
+import { IconStopwatch } from '@tabler/icons-react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useEffect } from 'react'
 
@@ -9,9 +10,15 @@ type SubtitleCarouselProps = {
   subtitles: Subtitle[]
   currentIndex: number
   onSelect: (index: number) => void
+  onTimerClick: () => void
 }
 
-export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: SubtitleCarouselProps) => {
+export const SubtitleCarousel = ({
+  subtitles,
+  currentIndex,
+  onSelect,
+  onTimerClick,
+}: SubtitleCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     containScroll: false,
@@ -52,7 +59,7 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
   return (
     <div className="overflow-hidden">
       <div ref={emblaRef}>
-        <div className="flex ml-4">
+        <div className="flex ml-4 gap-2">
           {subtitles.map((subtitle, index) => {
             const isActive = currentIndex === index
 
@@ -64,31 +71,45 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
               >
                 <div
                   className={cn(
-                    'bg-white p-4 transition-all border rounded border-gray-300 duration-300 cursor-pointer',
-                    isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-50',
+                    'flex flex-col relative bg-white p-4 transition-all border rounded-lg border-gray-300 duration-300 min-h-[37vh]',
+                    isActive ? 'opacity-100' : 'opacity-50',
                   )}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span
+                        className={cn(
+                          'text-xs font-semibold',
+                          isActive ? 'text-purple-600' : 'text-gray-400',
+                        )}
+                      >
+                        #{subtitle.index}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {formatTime(subtitle.startTime)} - {formatTime(subtitle.endTime)}
+                      </span>
+                    </div>
+                    <p
                       className={cn(
-                        'text-xs font-semibold',
-                        isActive ? 'text-purple-600' : 'text-gray-400',
+                        'text-base leading-relaxed',
+                        isActive ? 'text-gray-900 font-medium' : 'text-gray-600',
                       )}
                     >
-                      #{subtitle.index}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {formatTime(subtitle.startTime)} - {formatTime(subtitle.endTime)}
-                    </span>
+                      {subtitle.text}
+                    </p>
                   </div>
-                  <p
-                    className={cn(
-                      'text-base leading-relaxed',
-                      isActive ? 'text-gray-900 font-medium' : 'text-gray-600',
-                    )}
-                  >
-                    {subtitle.text}
-                  </p>
+                  <div className="flex items-end justify-between">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-semibold"> 1</span>/<span>2</span>
+                    </p>
+
+                    <button
+                      className="bg-white p-1.5 rounded-full border border-gray-400 text-gray-800"
+                      onClick={onTimerClick}
+                    >
+                      <IconStopwatch />
+                    </button>
+                  </div>
                 </div>
               </div>
             )

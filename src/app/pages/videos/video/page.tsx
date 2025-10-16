@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router'
 
 import { PageAppBarWithBack, PageContent, PageLayout } from '@/components/layouts/page'
 import { type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
+import { TimePickerBottomSheet } from '@/components/time-picker-bottom-sheet'
 import { type VideoControllerRef } from '@/components/video-controller'
 import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { defaultSubtitles } from '@/data/dialogue'
 import { SubtitleCarousel } from '@/features/video/components/subtitle-carousel'
-import { TimerList } from '@/features/video/components/timer-list'
+import { TimerOverlay } from '@/features/video/components/timer-overlay'
 import { YouTubePlayer, type YouTubePlayerRef } from '@/features/video/components/youtube-player'
 import type { Subtitle } from '@/features/video/types'
 import { useIsSentenceUpdated } from '@/stores/is-sentence-updated-store'
@@ -15,12 +16,16 @@ import { useGlobalModal } from '@/stores/modal-store'
 import { useOnBoarding } from '@/stores/onboarding-store'
 import { useSavedSubtitlesStore } from '@/stores/saved-subtitles-store'
 
+import { Toolbar } from './_components/toolbar'
+
 const VideoPage = () => {
   const { videoId } = useParams<{ videoId: string }>()
+  const [isTimerBottomSheetOpened, setIsTimerBottomSheetOpened] = useState(false)
 
   const [subtitles, setSubtitles] = useState<Subtitle[]>(defaultSubtitles)
   const [isLoadingDialogues, setIsLoadingDialogues] = useState(true)
-
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [timerDuration, setTimerDuration] = useState(0)
   const [currentDialogue, setCurrentDialogue] = useState<Subtitle>(subtitles[0])
 
   const navigate = useNavigate()
@@ -48,6 +53,32 @@ const VideoPage = () => {
     : undefined
 
   const isSaved = !!savedSubtitle
+
+  const handleTimeConfirm = (minutes: number, seconds: number) => {
+    const totalSeconds = minutes * 60 + seconds
+    setTimerDuration(totalSeconds)
+    setIsTimerRunning(true)
+    setIsTimerBottomSheetOpened(false)
+  }
+
+  const handleCloseTimer = () => {
+    setIsTimerRunning(false)
+    setTimerDuration(0)
+  }
+
+  const handleTimerComplete = () => {
+    alert('타이머가 종료되었습니다!')
+    setIsTimerRunning(false)
+    setTimerDuration(0)
+  }
+
+  const handleOpenTimerBottomSheet = () => {
+    setIsTimerBottomSheetOpened(true)
+  }
+
+  const handleCloseTimerBottomSheet = () => {
+    setIsTimerBottomSheetOpened(false)
+  }
 
   // Load dialogues for the current video
   useEffect(() => {
@@ -240,7 +271,7 @@ const VideoPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col mx-auto bg-amber-50-50"
+      className="min-h-screen flex flex-col mx-auto bg-gray-50"
       style={{ maxWidth: MAX_APP_SCREEN_WIDTH }}
     >
       {/* <Button
@@ -250,11 +281,13 @@ const VideoPage = () => {
       >
         zz
       </Button> */}
+
       <YouTubePlayer
         onStateChange={handleStateChange}
         ref={playerRef}
         videoId={videoId}
         initialTime={0}
+        disabled={isTimerRunning}
       />
 
       {/* 자막 담기 버튼 */}
@@ -267,17 +300,17 @@ const VideoPage = () => {
         /> */}
 
       {/* 타이머 리스트 */}
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <TimerList
           onTimerComplete={() => {
             alert('타이머가 종료되었습니다!')
           }}
         />
-      </div>
+      </div> */}
 
       {/* 자막 캐러셀 */}
       {subtitles.length > 0 && (
-        <div className="mt-4">
+        <div className="my-3">
           <SubtitleCarousel
             subtitles={subtitles}
             currentIndex={subtitles.findIndex(s => s.index === currentDialogue?.index)}
@@ -286,17 +319,24 @@ const VideoPage = () => {
               setCurrentDialogue(selected)
               playerRef.current?.seekTo(selected.startTime)
             }}
+            onTimerClick={handleOpenTimerBottomSheet}
           />
         </div>
       )}
+      <Toolbar />
 
-      {/* <VideoController
-          ref={videoControllerRef}
-          isPlaying={playerState === 1}
-          togglePlay={handleTogglePlay}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-        /> */}
+      <TimePickerBottomSheet
+        open={isTimerBottomSheetOpened}
+        onClose={handleCloseTimerBottomSheet}
+        onConfirm={handleTimeConfirm}
+      />
+
+      <TimerOverlay
+        isOpen={isTimerRunning}
+        duration={timerDuration}
+        onClose={handleCloseTimer}
+        onComplete={handleTimerComplete}
+      />
     </div>
   )
 }
