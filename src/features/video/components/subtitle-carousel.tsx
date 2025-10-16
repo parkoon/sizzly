@@ -13,6 +13,7 @@ type SubtitleCarouselProps = {
 
 export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: SubtitleCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
     containScroll: false,
   })
 
@@ -51,14 +52,14 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
   return (
     <div className="overflow-hidden">
       <div ref={emblaRef}>
-        <div className="flex gap-3 pl-4 pr-4">
+        <div className="flex ml-4">
           {subtitles.map((subtitle, index) => {
             const isActive = currentIndex === index
 
             return (
               <div
                 key={subtitle.index}
-                className="flex-[0_0_calc(100%-32px)]"
+                className="flex-[0_0_calc(100%-48px)]"
                 onClick={() => handleCardClick(index)}
               >
                 <div
