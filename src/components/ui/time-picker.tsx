@@ -11,6 +11,11 @@ const WHEEL_ITEM_RADIUS = CIRCLE_DEGREES / WHEEL_ITEM_COUNT
 const IN_VIEW_DEGREES = WHEEL_ITEM_RADIUS * WHEEL_ITEMS_IN_VIEW
 const WHEEL_RADIUS = Math.round(WHEEL_ITEM_SIZE / 2 / Math.tan(Math.PI / WHEEL_ITEM_COUNT))
 
+// 스타일 상수
+const PERSPECTIVE_OFFSET = 130 // px
+const TRANSFORM_OFFSET = 27 // px
+const LABEL_OFFSET = 55 // px
+
 // 값 검증 유틸리티
 const clampValue = (value: number, min: number, max: number): number => {
   return Math.max(min, Math.min(max, value))
@@ -237,8 +242,13 @@ const IosPickerItem: React.FC<IosPickerItemProps> = props => {
           style={{
             perspective: '1000px',
             perspectiveOrigin:
-              perspective === 'left' ? 'calc(50% + 130px) 50%' : 'calc(50% - 130px) 50%',
-            transform: perspective === 'left' ? 'translateX(27px)' : 'translateX(-27px)',
+              perspective === 'left'
+                ? `calc(50% + ${PERSPECTIVE_OFFSET}px) 50%`
+                : `calc(50% - ${PERSPECTIVE_OFFSET}px) 50%`,
+            transform:
+              perspective === 'left'
+                ? `translateX(${TRANSFORM_OFFSET}px)`
+                : `translateX(-${TRANSFORM_OFFSET}px)`,
             WebkitUserSelect: 'none',
             WebkitTouchCallout: 'none',
             WebkitTapHighlightColor: 'transparent',
@@ -254,19 +264,24 @@ const IosPickerItem: React.FC<IosPickerItemProps> = props => {
           >
             {slides.map((_, index) => (
               <div
-                className="w-full h-full text-center flex items-center justify-center opacity-0"
+                className="w-full h-full text-lg tabular-nums text-center flex items-center justify-center opacity-0"
                 style={{
                   backfaceVisibility: 'hidden',
                 }}
                 key={index}
               >
-                {index}
+                {String(index).padStart(2, '0')}
               </div>
             ))}
           </div>
         </div>
       </div>
-      <div className="font-semibold -translate-x-[55px] pointer-events-non">{label}</div>
+      <div
+        className="font-semibold text-sm text-gray-600 pointer-events-none"
+        style={{ transform: `translateX(-${LABEL_OFFSET}px)` }}
+      >
+        {label}
+      </div>
     </div>
   )
 }
