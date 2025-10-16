@@ -13,8 +13,8 @@ type SubtitleCarouselProps = {
 
 export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: SubtitleCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: 'center',
-    containScroll: false,
+    align: 'start',
+    containScroll: 'trimSnaps',
     skipSnaps: false,
     dragFree: false,
   })
@@ -42,48 +42,50 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
   }, [emblaApi, handleSelect])
 
   return (
-    <div ref={emblaRef}>
-      <div className="flex gap-3 ">
-        {subtitles.map((subtitle, index) => {
-          const isActive = currentIndex === index
+    <div className="overflow-hidden">
+      <div ref={emblaRef}>
+        <div className="flex gap-3 pl-4 pr-4">
+          {subtitles.map((subtitle, index) => {
+            const isActive = currentIndex === index
 
-          return (
-            <div
-              key={subtitle.index}
-              className="flex-[0_0_calc(100%-64px)] min-w-0"
-              onClick={() => onSelect(index)}
-            >
+            return (
               <div
-                className={cn(
-                  'bg-white p-4 transition-all border rounded border-gray-300 duration-300 cursor-pointer',
-                  isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-50',
-                )}
+                key={subtitle.index}
+                className="flex-[0_0_calc(100%-32px)] min-w-0"
+                onClick={() => onSelect(index)}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className={cn(
-                      'text-xs font-semibold',
-                      isActive ? 'text-purple-600' : 'text-gray-400',
-                    )}
-                  >
-                    #{subtitle.index}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {formatTime(subtitle.startTime)} - {formatTime(subtitle.endTime)}
-                  </span>
-                </div>
-                <p
+                <div
                   className={cn(
-                    'text-base leading-relaxed',
-                    isActive ? 'text-gray-900 font-medium' : 'text-gray-600',
+                    'bg-white p-4 transition-all border rounded border-gray-300 duration-300 cursor-pointer',
+                    isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-50',
                   )}
                 >
-                  {subtitle.text}
-                </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className={cn(
+                        'text-xs font-semibold',
+                        isActive ? 'text-purple-600' : 'text-gray-400',
+                      )}
+                    >
+                      #{subtitle.index}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {formatTime(subtitle.startTime)} - {formatTime(subtitle.endTime)}
+                    </span>
+                  </div>
+                  <p
+                    className={cn(
+                      'text-base leading-relaxed',
+                      isActive ? 'text-gray-900 font-medium' : 'text-gray-600',
+                    )}
+                  >
+                    {subtitle.text}
+                  </p>
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </div>
   )
