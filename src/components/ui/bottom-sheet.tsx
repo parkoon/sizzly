@@ -13,6 +13,7 @@ type BottomSheetProps = {
   open?: boolean
   maskClosable?: boolean
   hideCloseButton?: boolean
+  dismissible?: boolean
   height?: number | string
   onClose?(): void
 }
@@ -27,9 +28,10 @@ export const BottomSheet = ({
   height = 'fit-content',
   hideCloseButton = false,
   maskClosable = true,
+  dismissible = true,
 }: BottomSheetProps) => {
   return (
-    <Drawer.Root open={open} onClose={onClose} noBodyStyles>
+    <Drawer.Root open={open} onClose={onClose} noBodyStyles dismissible={dismissible}>
       <Drawer.Portal>
         <Drawer.Overlay
           className="fixed inset-0 z-50 bg-black/10"
@@ -37,7 +39,7 @@ export const BottomSheet = ({
         />
         <Drawer.Content
           className={cn(
-            'no-scrollbar nb-shadow fixed inset-x-0 z-50 mx-auto mt-24 h-[50%] overflow-hidden rounded bg-white p-4 outline-none',
+            'scrollbar-hide nb-shadow fixed inset-x-0 z-50 mx-auto mt-24 h-[50%] overflow-hidden rounded bg-white p-4 outline-none',
             className,
           )}
           style={{
