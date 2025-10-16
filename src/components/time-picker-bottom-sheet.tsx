@@ -1,0 +1,62 @@
+import { useState } from 'react'
+
+import { BottomSheet } from './ui/bottom-sheet'
+import { Button } from './ui/button'
+import { TimePicker } from './ui/time-picker'
+
+type TimePickerBottomSheetProps = {
+  open: boolean
+  onClose: () => void
+  onConfirm: (minutes: number, seconds: number) => void
+  initialMinutes?: number
+  initialSeconds?: number
+}
+
+export const TimePickerBottomSheet = ({
+  open,
+  onClose,
+  onConfirm,
+  initialMinutes = 0,
+  initialSeconds = 30,
+}: TimePickerBottomSheetProps) => {
+  const [selectedMinutes, setSelectedMinutes] = useState(initialMinutes)
+  const [selectedSeconds, setSelectedSeconds] = useState(initialSeconds)
+
+  const handleMinutesChange = (value: number) => {
+    setSelectedMinutes(value)
+  }
+
+  const handleSecondsChange = (value: number) => {
+    setSelectedSeconds(value)
+  }
+
+  const handleConfirm = () => {
+    const totalSeconds = selectedMinutes * 60 + selectedSeconds
+    if (totalSeconds === 0) {
+      alert('시간을 설정해주세요!')
+      return
+    }
+
+    onConfirm(selectedMinutes, selectedSeconds)
+  }
+
+  return (
+    <BottomSheet open={open} onClose={onClose} dismissible={false} hideCloseButton>
+      <TimePicker
+        initialMinutes={selectedMinutes}
+        initialSeconds={selectedSeconds}
+        onMinutesChange={handleMinutesChange}
+        onSecondsChange={handleSecondsChange}
+      />
+
+      <div className="mt-8 flex gap-2">
+        <Button variant="outline" onClick={onClose} className="flex-1">
+          취소
+        </Button>
+        <Button onClick={handleConfirm} className="flex-1">
+          시작
+        </Button>
+      </div>
+    </BottomSheet>
+  )
+}
