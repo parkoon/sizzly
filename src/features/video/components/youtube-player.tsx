@@ -22,6 +22,7 @@ type YouTubePlayerProps = {
   videoId: string
   initialTime?: number
   autoPlay?: boolean
+  disabled?: boolean
   onStateChange: (state: number) => void
 }
 
@@ -35,7 +36,7 @@ export type YouTubePlayerRef = {
 }
 
 export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
-  ({ videoId, initialTime, autoPlay = false, onStateChange }, ref) => {
+  ({ videoId, initialTime, autoPlay = false, disabled = false, onStateChange }, ref) => {
     const [showPlayer, setShowPlayer] = useState(false)
     const [isPlayerReady, setIsPlayerReady] = useState(false)
     const playerRef = useRef<YTPlayer | null>(null)
@@ -120,7 +121,9 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
     }))
 
     return (
-      <div className="relative w-full aspect-video bg-black">
+      <div
+        className={`relative w-full aspect-video bg-black ${disabled ? 'pointer-events-none' : ''}`}
+      >
         {/* 플레이어 로딩 오버레이 */}
         <div className={`absolute inset-0 flex flex-col items-center justify-center`}>
           <p className="text-white/70 text-sm text-center px-4">
@@ -137,8 +140,6 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
           }`}
         >
           <div id="youtube-player" ref={containerRef} className="w-full h-full" />
-          {/* YouTube 플레이어 클릭 방지 오버레이 */}
-          {/* <div className="absolute inset-0 z-10" /> */}
         </div>
       </div>
     )
