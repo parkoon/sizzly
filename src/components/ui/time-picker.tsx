@@ -193,10 +193,11 @@ const IosPickerItem: React.FC<IosPickerItemProps> = props => {
     [slideCount, rotationOffset, totalRadius, loop],
   )
 
-  const handleSelect = useCallback((emblaApi: EmblaCarouselType) => {
+  const handleSelect = useCallback(() => {
+    if (!emblaApi) return
     const selectedIndex = emblaApi.selectedScrollSnap()
     onValueChangeRef.current?.(selectedIndex)
-  }, [])
+  }, [emblaApi])
 
   useEffect(() => {
     if (!emblaApi) return
@@ -207,6 +208,11 @@ const IosPickerItem: React.FC<IosPickerItemProps> = props => {
       const factor = Math.abs(diffToTarget) < WHEEL_ITEM_SIZE / 2.5 ? 10 : 0.1
       const distance = diffToTarget * factor
       scrollTo.distance(distance, true)
+
+      // 스냅 애니메이션 완료 후 값 업데이트 (약 300ms)
+      setTimeout(() => {
+        handleSelect()
+      }, 300)
     }
 
     const handleReInit = (api: EmblaCarouselType) => {
@@ -217,19 +223,17 @@ const IosPickerItem: React.FC<IosPickerItemProps> = props => {
     // 이벤트 리스너 등록
     emblaApi.on('pointerUp', handlePointerUp)
     emblaApi.on('scroll', rotateWheel)
-    emblaApi.on('settle', handleSelect)
     emblaApi.on('reInit', handleReInit)
 
     // 초기 설정
     inactivateEmblaTransform(emblaApi)
     rotateWheel(emblaApi)
-    handleSelect(emblaApi)
+    handleSelect()
 
     // 클린업: 메모리 누수 방지
     return () => {
       emblaApi.off('pointerUp', handlePointerUp)
       emblaApi.off('scroll', rotateWheel)
-      emblaApi.off('settle', handleSelect)
       emblaApi.off('reInit', handleReInit)
     }
   }, [emblaApi, inactivateEmblaTransform, rotateWheel, handleSelect])
