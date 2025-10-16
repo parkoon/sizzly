@@ -13,10 +13,7 @@ type SubtitleCarouselProps = {
 
 export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: SubtitleCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: 'start',
-    containScroll: 'trimSnaps',
-    skipSnaps: false,
-    dragFree: false,
+    containScroll: false,
   })
 
   // 현재 인덱스가 변경되면 해당 슬라이드로 스크롤
@@ -32,6 +29,16 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
     const selected = emblaApi.selectedScrollSnap()
     onSelect(selected)
   }, [emblaApi, onSelect])
+
+  // 카드 클릭 시 해당 슬라이드로 이동
+  const handleCardClick = useCallback(
+    (index: number) => {
+      if (emblaApi) {
+        emblaApi.scrollTo(index)
+      }
+    },
+    [emblaApi],
+  )
 
   useEffect(() => {
     if (!emblaApi) return
@@ -51,8 +58,8 @@ export const SubtitleCarousel = ({ subtitles, currentIndex, onSelect }: Subtitle
             return (
               <div
                 key={subtitle.index}
-                className="flex-[0_0_calc(100%-32px)] min-w-0"
-                onClick={() => onSelect(index)}
+                className="flex-[0_0_calc(100%-32px)]"
+                onClick={() => handleCardClick(index)}
               >
                 <div
                   className={cn(
