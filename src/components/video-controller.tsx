@@ -3,8 +3,6 @@ import {
   IconPlayerPlayFilled,
   IconPlayerSkipBackFilled,
   IconPlayerSkipForwardFilled,
-  IconRepeat,
-  IconRepeatOff,
 } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
 import { forwardRef, useImperativeHandle, useState } from 'react'
@@ -13,11 +11,9 @@ import { usePrimaryColor } from '@/hooks/use-primary-color'
 
 type VideoControllerProps = {
   isPlaying: boolean
-  isRepeatMode: boolean
   onPrevious: () => void
   onNext: () => void
   togglePlay: () => void
-  toggleRepeat: () => void
 }
 
 export type VideoControllerRef = {
@@ -26,7 +22,7 @@ export type VideoControllerRef = {
 }
 
 export const VideoController = forwardRef<VideoControllerRef, VideoControllerProps>(
-  ({ togglePlay, isPlaying, isRepeatMode, onPrevious, onNext, toggleRepeat }, ref) => {
+  ({ togglePlay, isPlaying, onPrevious, onNext }, ref) => {
     const [isBlinking, setIsBlinking] = useState(false)
     const primaryColor = usePrimaryColor()
 
@@ -94,9 +90,9 @@ export const VideoController = forwardRef<VideoControllerRef, VideoControllerPro
 
               {/* 구간 반복 버튼 */}
             </div>
-            <button onClick={toggleRepeat} className={'p-2 rounded-full transition-color'}>
-              {isRepeatMode ? <IconRepeat /> : <IconRepeatOff />}
-            </button>
+            {/* <button onClick={toggleBookmark} className={'p-2 rounded-full transition-color'}>
+              {isRepeatMode ? <IconBookmar /> : <IconRepeatOff />}
+            </button> */}
           </div>
         </div>
       </div>

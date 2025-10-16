@@ -1,12 +1,13 @@
-import type { Dialogue } from '@/types/youtube'
+import type { Subtitle } from '@/features/video/types'
 
 /**
  * Dynamically imports dialogue data for a specific video
  * This enables code splitting and reduces initial bundle size
  */
-export const getDialogue = async (videoId: string): Promise<Dialogue[]> => {
+export const getDialogue = async (videoId: string): Promise<Subtitle[]> => {
   try {
-    const module = await import(`./dialogues/${videoId}.ts`)
+    const module = await import(`@/features/video/constants/subtitles/${videoId}.json`)
+    console.log('🚀 ~ getDialogue ~ module:', module)
     return module.dialogues
   } catch (error) {
     console.error(`Failed to load dialogue for video: ${videoId}`, error)
@@ -15,12 +16,11 @@ export const getDialogue = async (videoId: string): Promise<Dialogue[]> => {
 }
 
 // 기본 자막 (비디오 ID가 없을 때)
-export const defaultSubtitles: Dialogue[] = [
+export const defaultSubtitles: Subtitle[] = [
   {
-    id: '1',
-    startTime: '00:00:00',
-    endTime: '00:00:00',
+    index: 1,
+    startTime: 0,
+    endTime: 0,
     text: 'No subtitles available',
-    translation: '자막을 사용할 수 없습니다',
   },
 ]

@@ -9,9 +9,9 @@ export const paths = {
       getHref: () => '/bookmarks',
     },
   },
-  watch: {
-    path: '/watch/:videoId',
-    getHref: (videoId: string) => `/watch/${videoId}`,
+  video: {
+    path: '/videos/:videoId',
+    getHref: (videoId: string) => `/videos/${videoId}`,
   },
   my: {
     sentences: {

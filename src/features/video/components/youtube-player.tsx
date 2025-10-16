@@ -82,7 +82,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
             onReady: event => {
               if (autoPlay) {
                 // Chrome, Safari 등은 사용자 상호작용 없이 소리가 나는 동영상 자동재생을 차단
-                // event.target.mute()
+                event.target.mute()
                 event.target.playVideo()
               }
               setIsPlayerReady(true)

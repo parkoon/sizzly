@@ -24,8 +24,8 @@ export const createAppRouter = (queryClient: QueryClient) =>
       ],
     },
     {
-      path: paths.watch.path,
-      lazy: () => import('./pages/watch').then(convert(queryClient)),
+      path: paths.video.path,
+      lazy: () => import('./pages/videos/video/page').then(convert(queryClient)),
     },
     {
       path: paths.my.sentences.path,
