@@ -1,15 +1,20 @@
 import type { EmblaCarouselType } from 'embla-carousel'
 import useEmblaCarousel from 'embla-carousel-react'
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 const CIRCLE_DEGREES = 360
 const WHEEL_ITEM_SIZE = 32
 const WHEEL_ITEM_COUNT = 18
 const WHEEL_ITEMS_IN_VIEW = 4
 
-export const WHEEL_ITEM_RADIUS = CIRCLE_DEGREES / WHEEL_ITEM_COUNT
-export const IN_VIEW_DEGREES = WHEEL_ITEM_RADIUS * WHEEL_ITEMS_IN_VIEW
-export const WHEEL_RADIUS = Math.round(WHEEL_ITEM_SIZE / 2 / Math.tan(Math.PI / WHEEL_ITEM_COUNT))
+const WHEEL_ITEM_RADIUS = CIRCLE_DEGREES / WHEEL_ITEM_COUNT
+const IN_VIEW_DEGREES = WHEEL_ITEM_RADIUS * WHEEL_ITEMS_IN_VIEW
+const WHEEL_RADIUS = Math.round(WHEEL_ITEM_SIZE / 2 / Math.tan(Math.PI / WHEEL_ITEM_COUNT))
+
+// 값 검증 유틸리티
+const clampValue = (value: number, min: number, max: number): number => {
+  return Math.max(min, Math.min(max, value))
+}
 
 type TimePickerProps = {
   initialMinutes?: number
@@ -24,8 +29,12 @@ export const TimePicker = ({
   onMinutesChange,
   onSecondsChange,
 }: TimePickerProps) => {
+  // 초기값 검증 (0-59 범위)
+  const validatedMinutes = clampValue(initialMinutes, 0, 59)
+  const validatedSeconds = clampValue(initialSeconds, 0, 59)
+
   return (
-    <div className="relative flex w-full h-[22.2rem] max-w-[30rem] mx-auto">
+    <div className="relative flex w-full h-[30vh]  mx-auto">
       {/* 상단 그라데이션 오버레이 */}
       <div
         className="absolute left-0 right-0 pointer-events-none z-10"
@@ -55,7 +64,7 @@ export const TimePicker = ({
         perspective="left"
         loop={false}
         label="분"
-        initialValue={initialMinutes}
+        initialValue={validatedMinutes}
         onValueChange={onMinutesChange}
       />
       <IosPickerItem
@@ -63,7 +72,7 @@ export const TimePicker = ({
         perspective="right"
         loop={false}
         label="초"
-        initialValue={initialSeconds}
+        initialValue={validatedSeconds}
         onValueChange={onSecondsChange}
       />
     </div>
@@ -81,6 +90,8 @@ const setSlideStyles = (
   totalRadius: number,
 ): void => {
   const slideNode = emblaApi.slideNodes()[index]
+  if (!slideNode) return // null 체크 추가
+
   const wheelLocation = emblaApi.scrollProgress() * totalRadius
   const positionDefault = emblaApi.scrollSnapList()[index] * totalRadius
   const positionLoopStart = positionDefault + totalRadius
@@ -114,11 +125,11 @@ const setSlideStyles = (
   }
 }
 
-export const setContainerStyles = (emblaApi: EmblaCarouselType, wheelRotation: number): void => {
+const setContainerStyles = (emblaApi: EmblaCarouselType, wheelRotation: number): void => {
   emblaApi.containerNode().style.transform = `translateZ(${WHEEL_RADIUS}px) rotateX(${wheelRotation}deg)`
 }
 
-type PropType = {
+type IosPickerItemProps = {
   loop?: boolean
   label: string
   slideCount: number
@@ -127,20 +138,32 @@ type PropType = {
   initialValue?: number
 }
 
-export const IosPickerItem: React.FC<PropType> = props => {
+const IosPickerItem: React.FC<IosPickerItemProps> = props => {
   const { slideCount, perspective, label, loop = false, onValueChange, initialValue = 0 } = props
+
+  // 초기값 검증
+  const validatedInitialValue = clampValue(initialValue, 0, slideCount - 1)
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop,
     axis: 'y',
     dragFree: true,
     containScroll: false,
     watchSlides: false,
-    startIndex: initialValue,
+    startIndex: validatedInitialValue,
   })
-  const rootNodeRef = useRef<HTMLDivElement>(null)
+
   const totalRadius = slideCount * WHEEL_ITEM_RADIUS
   const rotationOffset = loop ? 0 : WHEEL_ITEM_RADIUS
-  const slides = Array.from(Array(slideCount).keys())
+
+  // slides 배열 메모이제이션으로 불필요한 재생성 방지
+  const slides = useMemo(() => Array.from(Array(slideCount).keys()), [slideCount])
+
+  // onValueChange를 ref로 관리하여 stale closure 방지
+  const onValueChangeRef = useRef(onValueChange)
+  useEffect(() => {
+    onValueChangeRef.current = onValueChange
+  }, [onValueChange])
 
   const inactivateEmblaTransform = useCallback((emblaApi: EmblaCarouselType) => {
     if (!emblaApi) return
@@ -165,46 +188,50 @@ export const IosPickerItem: React.FC<PropType> = props => {
     [slideCount, rotationOffset, totalRadius, loop],
   )
 
-  const handleSelect = useCallback(
-    (emblaApi: EmblaCarouselType) => {
-      const selectedIndex = emblaApi.selectedScrollSnap()
-      onValueChange?.(selectedIndex)
-    },
-    [onValueChange],
-  )
+  const handleSelect = useCallback((emblaApi: EmblaCarouselType) => {
+    const selectedIndex = emblaApi.selectedScrollSnap()
+    onValueChangeRef.current?.(selectedIndex)
+  }, [])
 
   useEffect(() => {
     if (!emblaApi) return
 
-    emblaApi.on('pointerUp', emblaApi => {
-      const { scrollTo, target, location } = emblaApi.internalEngine()
+    const handlePointerUp = (api: EmblaCarouselType) => {
+      const { scrollTo, target, location } = api.internalEngine()
       const diffToTarget = target.get() - location.get()
       const factor = Math.abs(diffToTarget) < WHEEL_ITEM_SIZE / 2.5 ? 10 : 0.1
       const distance = diffToTarget * factor
       scrollTo.distance(distance, true)
-    })
+    }
 
+    const handleReInit = (api: EmblaCarouselType) => {
+      inactivateEmblaTransform(api)
+      rotateWheel(api)
+    }
+
+    // 이벤트 리스너 등록
+    emblaApi.on('pointerUp', handlePointerUp)
     emblaApi.on('scroll', rotateWheel)
     emblaApi.on('settle', handleSelect)
+    emblaApi.on('reInit', handleReInit)
 
-    emblaApi.on('reInit', emblaApi => {
-      inactivateEmblaTransform(emblaApi)
-      rotateWheel(emblaApi)
-    })
-
+    // 초기 설정
     inactivateEmblaTransform(emblaApi)
     rotateWheel(emblaApi)
-
-    // 초기값 콜백 호출
     handleSelect(emblaApi)
+
+    // 클린업: 메모리 누수 방지
+    return () => {
+      emblaApi.off('pointerUp', handlePointerUp)
+      emblaApi.off('scroll', rotateWheel)
+      emblaApi.off('settle', handleSelect)
+      emblaApi.off('reInit', handleReInit)
+    }
   }, [emblaApi, inactivateEmblaTransform, rotateWheel, handleSelect])
 
   return (
-    <div className="h-full flex items-center min-w-[50%] justify-center leading-none text-[1.8rem]">
-      <div
-        className="min-w-full h-full overflow-hidden flex items-center touch-pan-x"
-        ref={rootNodeRef}
-      >
+    <div className="h-full flex items-center min-w-[50%] justify-center leading-none">
+      <div className="min-w-full h-full overflow-hidden flex items-center touch-pan-x">
         <div
           className="h-8 w-full select-none"
           style={{
@@ -227,7 +254,7 @@ export const IosPickerItem: React.FC<PropType> = props => {
           >
             {slides.map((_, index) => (
               <div
-                className="w-full h-full text-[19px] text-center flex items-center justify-center opacity-0"
+                className="w-full h-full text-center flex items-center justify-center opacity-0"
                 style={{
                   backfaceVisibility: 'hidden',
                 }}
@@ -239,7 +266,7 @@ export const IosPickerItem: React.FC<PropType> = props => {
           </div>
         </div>
       </div>
-      <div className="font-bold -translate-x-[55px] pointer-events-none text-sm">{label}</div>
+      <div className="font-semibold -translate-x-[55px] pointer-events-non">{label}</div>
     </div>
   )
 }
