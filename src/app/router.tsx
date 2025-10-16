@@ -15,7 +15,7 @@ export const createAppRouter = (queryClient: QueryClient) =>
       children: [
         {
           index: true,
-          lazy: () => import('./pages/home').then(convert(queryClient)),
+          lazy: () => import('./pages/videos/page').then(convert(queryClient)),
         },
         {
           path: paths.home.bookmarks.path,
