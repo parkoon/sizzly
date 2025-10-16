@@ -7,6 +7,7 @@ import { type VideoControllerRef } from '@/components/video-controller'
 import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { defaultSubtitles } from '@/data/dialogue'
 import { SubtitleCarousel } from '@/features/video/components/subtitle-carousel'
+import { TimerList } from '@/features/video/components/timer-list'
 import { YouTubePlayer, type YouTubePlayerRef } from '@/features/video/components/youtube-player'
 import type { Subtitle } from '@/features/video/types'
 import { useIsSentenceUpdated } from '@/stores/is-sentence-updated-store'
@@ -264,6 +265,15 @@ const VideoPage = () => {
           isSaved={isSaved}
           showTooltip={isFirstSaveDialogue}
         /> */}
+
+      {/* 타이머 리스트 */}
+      <div className="mt-4">
+        <TimerList
+          onTimerComplete={() => {
+            alert('타이머가 종료되었습니다!')
+          }}
+        />
+      </div>
 
       {/* 자막 캐러셀 */}
       {subtitles.length > 0 && (
