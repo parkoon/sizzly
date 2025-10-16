@@ -5,7 +5,7 @@
  * @returns YouTube thumbnail URL
  */
 type Quality = 'default' | 'medium' | 'high' | 'standard' | 'maxres'
-export const getYouTubeThumbnailUrl = (videoId: string, quality: Quality = 'medium'): string => {
+export const getYouTubeThumbnailUrl = (videoId: string, quality: Quality = 'standard'): string => {
   const qualityMap = {
     default: 'default', // 120x90
     medium: 'mqdefault', // 320x180
