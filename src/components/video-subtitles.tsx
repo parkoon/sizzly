@@ -1,24 +1,22 @@
-import type { Dialogue } from '@/types/youtube'
+import type { Subtitle } from '@/features/video/types'
 
 import { CommentaryMarkdown } from './commentary-markdown'
-import { HighlightedText } from './ui/highlighted-text'
 
 type VideoSubtitlesProps = {
-  data?: Dialogue
+  data?: Subtitle
 }
 export const VideoSubtitles = ({ data }: VideoSubtitlesProps) => {
   if (!data) return null
 
   return (
-    <div className="p-4">
+    <div className="px-4">
       <div className="">
-        <HighlightedText text={data.text} className="text-lg font-medium mb-2 block" />
-        <p className="text-sm text-gray-600">{data.translation}</p>
-        {data.commentary && (
+        <CommentaryMarkdown content={data.text} />
+        {/* {data.commentary && (
           <div className="mt-4">
             <CommentaryMarkdown content={data.commentary} />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react'
 import { useRef, useState } from 'react'
 
+import { TimePickerBottomSheet } from '@/components/time-picker-bottom-sheet'
 import { cn } from '@/lib/utils'
 
 import { type Timer, useTimer } from '../hooks/use-timer'
@@ -18,6 +19,7 @@ type TimerListProps = {
 
 export const TimerList = ({ onTimerComplete }: TimerListProps) => {
   const [timers, setTimers] = useState<Timer[]>(DEFAULT_TIMERS)
+  const [isTimePickerOpen, setIsTimePickerOpen] = useState(false)
   const { timerState, startTimer, pauseTimer, resumeTimer, resetTimer } = useTimer({
     onComplete: onTimerComplete,
   })
@@ -57,21 +59,23 @@ export const TimerList = ({ onTimerComplete }: TimerListProps) => {
   }
 
   const handleAddTimer = () => {
-    const duration = prompt('타이머 시간을 입력하세요 (분):')
-    if (!duration) return
+    setIsTimePickerOpen(true)
+  }
 
-    const minutes = parseInt(duration, 10)
-    if (isNaN(minutes) || minutes <= 0) {
-      alert('올바른 숫자를 입력하세요')
-      return
-    }
+  const handleTimePickerConfirm = (minutes: number, seconds: number) => {
+    const totalSeconds = minutes * 60 + seconds
 
     const newTimer: Timer = {
       id: Date.now().toString(),
-      duration: minutes * 60,
+      duration: totalSeconds,
     }
 
     setTimers([...timers, newTimer])
+    setIsTimePickerOpen(false)
+  }
+
+  const handleTimePickerClose = () => {
+    setIsTimePickerOpen(false)
   }
 
   const formatTime = (seconds: number): string => {
@@ -83,65 +87,75 @@ export const TimerList = ({ onTimerComplete }: TimerListProps) => {
   const isTimerRunning = timerState.isRunning
 
   return (
-    <div className="flex gap-2 items-center">
-      {/* + 버튼 고정 */}
-      <button
-        onClick={handleAddTimer}
-        disabled={isTimerRunning}
-        className={cn(
-          '  flex-shrink-0 flex gap-1 items-center justify-center px-2 h-8 rounded-full transition-colors ml-4 border border-gray-300 border-dashed',
-          isTimerRunning
-            ? 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'
-            : ' text-gray-600',
-        )}
-        aria-label="타이머 추가"
-      >
-        <IconPlus className="w-4 h-4" />
-        <span className="text-sm font-semibold">타이머 추가</span>
-      </button>
+    <>
+      <div className="flex gap-2 items-center">
+        {/* + 버튼 고정 */}
+        <button
+          onClick={handleAddTimer}
+          disabled={isTimerRunning}
+          className={cn(
+            '  flex-shrink-0 flex gap-1 items-center justify-center px-3 h-8 rounded-full transition-colors border border-gray-300 border-dashed',
+            isTimerRunning
+              ? 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'
+              : ' text-gray-600',
+          )}
+          aria-label="타이머 추가"
+        >
+          <IconPlus className="w-4 h-4" />
+          <span className="text-sm font-semibold">타이머</span>
+        </button>
 
-      {/* 타이머 버튼 스크롤 영역 */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-        {timers.map(timer => {
-          const isActive = timerState.timerId === timer.id
-          const isDisabled = isTimerRunning && !isActive
-          const displayTime = isActive ? timerState.remainingTime : timer.duration
+        {/* 타이머 버튼 스크롤 영역 */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {timers.map(timer => {
+            const isActive = timerState.timerId === timer.id
+            const isDisabled = isTimerRunning && !isActive
+            const displayTime = isActive ? timerState.remainingTime : timer.duration
 
-          return (
-            <button
-              key={timer.id}
-              onClick={() => handleTimerClick(timer)}
-              onMouseDown={() => handleLongPressStart(timer)}
-              onMouseUp={handleLongPressEnd}
-              onMouseLeave={handleLongPressEnd}
-              onTouchStart={() => handleLongPressStart(timer)}
-              onTouchEnd={handleLongPressEnd}
-              disabled={isDisabled}
-              className={cn(
-                'flex-shrink-0 px-3 h-8 rounded-full transition-all border border-gray-300',
-                isActive
-                  ? 'bg-orange-400 border-orange-400 text-white '
-                  : isDisabled
-                    ? 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'
-                    : 'text-gray-700 ',
-              )}
-            >
-              <div className="flex items-center gap-1">
-                {isActive ? (
-                  timerState.isRunning ? (
-                    <IconPlayerPauseFilled className="w-5 h-5" />
-                  ) : (
-                    <IconPlayerPlayFilled className="w-5 h-5" />
-                  )
-                ) : (
-                  <IconClock className="w-5 h-5 text-orange-500" />
+            return (
+              <button
+                key={timer.id}
+                onClick={() => handleTimerClick(timer)}
+                onMouseDown={() => handleLongPressStart(timer)}
+                onMouseUp={handleLongPressEnd}
+                onMouseLeave={handleLongPressEnd}
+                onTouchStart={() => handleLongPressStart(timer)}
+                onTouchEnd={handleLongPressEnd}
+                disabled={isDisabled}
+                className={cn(
+                  'flex-shrink-0 px-3 h-8 rounded-full transition-all border border-gray-300',
+                  isActive
+                    ? 'bg-orange-400 border-orange-400 text-white '
+                    : isDisabled
+                      ? 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'
+                      : 'text-gray-700 ',
                 )}
-                <span className="text-sm font-semibold">{formatTime(displayTime)}</span>
-              </div>
-            </button>
-          )
-        })}
+              >
+                <div className="flex items-center gap-1">
+                  {isActive ? (
+                    timerState.isRunning ? (
+                      <IconPlayerPauseFilled className="w-5 h-5" />
+                    ) : (
+                      <IconPlayerPlayFilled className="w-5 h-5" />
+                    )
+                  ) : (
+                    <IconClock className="w-5 h-5 text-orange-500" />
+                  )}
+                  <span className="text-sm font-semibold">{formatTime(displayTime)}</span>
+                </div>
+              </button>
+            )
+          })}
+        </div>
       </div>
-    </div>
+
+      <TimePickerBottomSheet
+        open={isTimePickerOpen}
+        onClose={handleTimePickerClose}
+        onConfirm={handleTimePickerConfirm}
+        initialMinutes={0}
+        initialSeconds={30}
+      />
+    </>
   )
 }

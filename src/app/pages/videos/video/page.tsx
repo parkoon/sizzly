@@ -1,13 +1,16 @@
+import { IconSalad } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import { PageAppBarWithBack, PageContent, PageLayout } from '@/components/layouts/page'
 import { type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
 import { TimePickerBottomSheet } from '@/components/time-picker-bottom-sheet'
-import { type VideoControllerRef } from '@/components/video-controller'
+import { VideoController, type VideoControllerRef } from '@/components/video-controller'
+import { VideoSubtitles } from '@/components/video-subtitles'
 import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { defaultSubtitles } from '@/data/dialogue'
 import { SubtitleCarousel } from '@/features/video/components/subtitle-carousel'
+import { TimerList } from '@/features/video/components/timer-list'
 import { TimerOverlay } from '@/features/video/components/timer-overlay'
 import { YouTubePlayer, type YouTubePlayerRef } from '@/features/video/components/youtube-player'
 import type { Subtitle } from '@/features/video/types'
@@ -16,17 +19,19 @@ import { useGlobalModal } from '@/stores/modal-store'
 import { useOnBoarding } from '@/stores/onboarding-store'
 import { useSavedSubtitlesStore } from '@/stores/saved-subtitles-store'
 
+import { MaterialGuideButton } from './_components/material-guide-button'
 import { Toolbar } from './_components/toolbar'
 
 const VideoPage = () => {
   const { videoId } = useParams<{ videoId: string }>()
   const [isTimerBottomSheetOpened, setIsTimerBottomSheetOpened] = useState(false)
-
+  const [isRepeatMode, setIsRepeatMode] = useState(false)
   const [subtitles, setSubtitles] = useState<Subtitle[]>(defaultSubtitles)
   const [isLoadingDialogues, setIsLoadingDialogues] = useState(true)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [timerDuration, setTimerDuration] = useState(0)
   const [currentDialogue, setCurrentDialogue] = useState<Subtitle>(subtitles[0])
+  const isRepeatModeRef = useRef(isRepeatMode)
 
   const navigate = useNavigate()
   const playerRef = useRef<YouTubePlayerRef>(null)
@@ -42,6 +47,8 @@ const VideoPage = () => {
   const currentDialogueRef = useRef(currentDialogue)
 
   const modal = useGlobalModal()
+
+  console.log(currentDialogue)
 
   const { addSubtitle, removeSubtitle, getSavedSubtitle } = useSavedSubtitlesStore()
 
@@ -84,12 +91,9 @@ const VideoPage = () => {
   useEffect(() => {
     if (!videoId) return
 
-    console.log('ok')
-
     const loadDialogues = async () => {
       setIsLoadingDialogues(true)
       const data = await getSubtitle(videoId)
-      console.log('🚀 ~ loadDialogues ~ data:', data)
       setSubtitles(data)
       if (data.length > 0) {
         setCurrentDialogue(data[0])
@@ -150,6 +154,15 @@ const VideoPage = () => {
     }
   }
 
+  const handleToggleRepeat = () => {
+    setIsRepeatMode(prev => {
+      const newValue = !prev
+      // ref도 함께 업데이트
+      isRepeatModeRef.current = newValue
+      return newValue
+    })
+  }
+
   const handleSaveSubtitle = () => {
     setFirstSaveDialogue(false)
 
@@ -193,6 +206,15 @@ const VideoPage = () => {
     // })
   }
 
+  const handleRepeatMode = (time: number) => {
+    const endTime = currentDialogue.endTime
+
+    if (time >= endTime) {
+      playerRef.current?.seekTo(currentDialogue.startTime)
+      setCurrentDialogue(currentDialogue)
+    }
+  }
+
   const startTimeTracking = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
@@ -202,34 +224,32 @@ const VideoPage = () => {
     intervalRef.current = setInterval(() => {
       if (playerRef.current) {
         const time = playerRef.current.getCurrentTime()
-        console.log('🚀 ~ startTimeTracking ~ time:', time)
 
         if (isDialogueEnded(time, subtitles)) {
           handleDialogueEnded()
           return
         }
 
-        // const hasSavedSubtitle = !!getSavedSubtitle(videoId!, currentDialogueRef.current.id)
+        const isRepeatMode = isRepeatModeRef.current
+        console.log('🚀 ~ startTimeTracking ~ isRepeatMode:', isRepeatMode)
 
-        // if (!hasSavedSubtitle && hasCommentaryRef.current && time >= endTimeRef.current) {
-        //   handleDialogueSaveGuide()
-        //   return
-        // }
+        if (isRepeatMode) {
+          handleRepeatMode(time)
+          return
+        }
 
-        // const 시간에따른다이얼로그 = subtitles.find(d => {
-        //   return time >= d.startTime && time < d.endTime
-        // })
+        const 시간에따른다이얼로그 = subtitles.find(d => {
+          return time >= d.startTime && time < d.endTime
+        })
 
-        // if (!시간에따른다이얼로그) {
-        //   return
-        // }
+        if (!시간에따른다이얼로그) {
+          return
+        }
 
-        // hasCommentaryRef.current = !!시간에따른다이얼로그.commentary
-        // endTimeRef.current = timeCodeToSeconds(시간에따른다이얼로그.endTime)
-
-        // setCurrentDialogue(시간에따른다이얼로그)
+        // 현재 다이얼로그와 다를 때만 업데이트
+        setCurrentDialogue(시간에따른다이얼로그)
       }
-    }, 200)
+    }, 100)
   }
 
   const stopTimeTracking = () => {
@@ -270,10 +290,7 @@ const VideoPage = () => {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col mx-auto bg-gray-50"
-      style={{ maxWidth: MAX_APP_SCREEN_WIDTH }}
-    >
+    <div className="min-h-screen flex flex-col mx-auto" style={{ maxWidth: MAX_APP_SCREEN_WIDTH }}>
       {/* <Button
         onClick={() => {
           playerRef.current?.seekTo(1047)
@@ -290,8 +307,23 @@ const VideoPage = () => {
         disabled={isTimerRunning}
       />
 
-      {/* 자막 담기 버튼 */}
+      <div className="p-4">
+        <TimerList
+          onTimerComplete={() => {
+            alert('타이머가 종료되었습니다!')
+          }}
+        />
+      </div>
 
+      {/* <div className="flex items-center gap-1 p-4">
+        <div className="flex gap-1">
+          <MaterialGuideButton />
+          <MaterialGuideButton />
+        </div>
+        <span className="text-gray-300">|</span>
+      </div> */}
+
+      {currentDialogue && <VideoSubtitles data={currentDialogue} />}
       {/* <SaveSubtitleButton
           ref={saveButtonRef}
           onClick={handleSaveSubtitle}
@@ -300,30 +332,33 @@ const VideoPage = () => {
         /> */}
 
       {/* 타이머 리스트 */}
-      {/* <div className="mt-4">
-        <TimerList
-          onTimerComplete={() => {
-            alert('타이머가 종료되었습니다!')
-          }}
-        />
-      </div> */}
 
-      {/* 자막 캐러셀 */}
-      {subtitles.length > 0 && (
+      <VideoController
+        ref={videoControllerRef}
+        isPlaying={playerState === 1}
+        isRepeatMode={isRepeatMode}
+        togglePlay={handleTogglePlay}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        toggleRepeat={handleToggleRepeat}
+      />
+
+      {/* {subtitles.length > 0 && (
         <div className="my-3">
           <SubtitleCarousel
             subtitles={subtitles}
             currentIndex={subtitles.findIndex(s => s.index === currentDialogue?.index)}
             onSelect={index => {
+              playerRef.current?.pause()
               const selected = subtitles[index]
-              setCurrentDialogue(selected)
               playerRef.current?.seekTo(selected.startTime)
+              setCurrentDialogue(selected)
             }}
             onTimerClick={handleOpenTimerBottomSheet}
           />
         </div>
-      )}
-      <Toolbar />
+      )} */}
+      {/* <Toolbar /> */}
 
       <TimePickerBottomSheet
         open={isTimerBottomSheetOpened}

@@ -3,17 +3,22 @@ import {
   IconPlayerPlayFilled,
   IconPlayerSkipBackFilled,
   IconPlayerSkipForwardFilled,
+  IconRepeat,
 } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 
+import { MaterialGuideButton } from '@/app/pages/videos/video/_components/material-guide-button'
 import { usePrimaryColor } from '@/hooks/use-primary-color'
+import { cn } from '@/lib/utils'
 
 type VideoControllerProps = {
   isPlaying: boolean
+  isRepeatMode: boolean
   onPrevious: () => void
   onNext: () => void
   togglePlay: () => void
+  toggleRepeat: () => void
 }
 
 export type VideoControllerRef = {
@@ -22,7 +27,7 @@ export type VideoControllerRef = {
 }
 
 export const VideoController = forwardRef<VideoControllerRef, VideoControllerProps>(
-  ({ togglePlay, isPlaying, onPrevious, onNext }, ref) => {
+  ({ togglePlay, isPlaying, isRepeatMode, onPrevious, onNext, toggleRepeat }, ref) => {
     const [isBlinking, setIsBlinking] = useState(false)
     const primaryColor = usePrimaryColor()
 
@@ -42,7 +47,7 @@ export const VideoController = forwardRef<VideoControllerRef, VideoControllerPro
         </div> */}
 
           <div className="relative flex items-center justify-between py-2 px-8">
-            <div />
+            <MaterialGuideButton />
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
               {/* 이전 자막 버튼 */}
               <button
@@ -90,9 +95,12 @@ export const VideoController = forwardRef<VideoControllerRef, VideoControllerPro
 
               {/* 구간 반복 버튼 */}
             </div>
-            {/* <button onClick={toggleBookmark} className={'p-2 rounded-full transition-color'}>
-              {isRepeatMode ? <IconBookmar /> : <IconRepeatOff />}
-            </button> */}
+            <button
+              onClick={toggleRepeat}
+              className={cn('p-2 rounded-full transition-color', isRepeatMode && 'text-primary')}
+            >
+              <IconRepeat />
+            </button>
           </div>
         </div>
       </div>
