@@ -1,15 +1,12 @@
-import { IconSalad } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
-import { PageAppBarWithBack, PageContent, PageLayout } from '@/components/layouts/page'
+import { PageLayout } from '@/components/layouts/page'
 import { type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
 import { TimePickerBottomSheet } from '@/components/time-picker-bottom-sheet'
 import { VideoController, type VideoControllerRef } from '@/components/video-controller'
 import { VideoSubtitles } from '@/components/video-subtitles'
-import { MAX_APP_SCREEN_WIDTH } from '@/config/app'
 import { defaultSubtitles } from '@/data/dialogue'
-import { SubtitleCarousel } from '@/features/video/components/subtitle-carousel'
 import { TimerList } from '@/features/video/components/timer-list'
 import { TimerOverlay } from '@/features/video/components/timer-overlay'
 import { YouTubePlayer, type YouTubePlayerRef } from '@/features/video/components/youtube-player'
@@ -19,8 +16,7 @@ import { useGlobalModal } from '@/stores/modal-store'
 import { useOnBoarding } from '@/stores/onboarding-store'
 import { useSavedSubtitlesStore } from '@/stores/saved-subtitles-store'
 
-import { MaterialGuideButton } from './_components/material-guide-button'
-import { Toolbar } from './_components/toolbar'
+import { BookmarkButton } from './_components/bookmark-button'
 
 const VideoPage = () => {
   const { videoId } = useParams<{ videoId: string }>()
@@ -277,28 +273,11 @@ const VideoPage = () => {
   }
 
   if (isLoadingDialogues) {
-    return (
-      <PageLayout>
-        <PageAppBarWithBack title="Chọn câu thoại để lưu" />
-        <PageContent>
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">Đang tải phụ đề...</div>
-          </div>
-        </PageContent>
-      </PageLayout>
-    )
+    return <div>로딩중...</div>
   }
 
   return (
-    <div className="min-h-screen flex flex-col mx-auto" style={{ maxWidth: MAX_APP_SCREEN_WIDTH }}>
-      {/* <Button
-        onClick={() => {
-          playerRef.current?.seekTo(1047)
-        }}
-      >
-        zz
-      </Button> */}
-
+    <PageLayout title="버터 당근 조림" right={<BookmarkButton />}>
       <YouTubePlayer
         onStateChange={handleStateChange}
         ref={playerRef}
@@ -372,7 +351,7 @@ const VideoPage = () => {
         onClose={handleCloseTimer}
         onComplete={handleTimerComplete}
       />
-    </div>
+    </PageLayout>
   )
 }
 
