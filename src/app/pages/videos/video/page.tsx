@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router'
 import { PageLayout } from '@/components/layouts/page'
 import { type SaveSubtitleButtonRef } from '@/components/save-subtitle-button'
 import { TimePickerBottomSheet } from '@/components/time-picker-bottom-sheet'
-import { VideoController, type VideoControllerRef } from '@/components/video-controller'
+import { type VideoControllerRef } from '@/components/video-controller'
 import { VideoSubtitles } from '@/components/video-subtitles'
 import { defaultSubtitles } from '@/data/dialogue'
 import { TimerList } from '@/features/video/components/timer-list'
@@ -17,6 +17,17 @@ import { useOnBoarding } from '@/stores/onboarding-store'
 import { useSavedSubtitlesStore } from '@/stores/saved-subtitles-store'
 
 import { BookmarkButton } from './_components/bookmark-button'
+import { type Material, MaterialAccordion } from './_components/material-accordion'
+import { SubtitleProgressBar } from './_components/subtitle-progress-bar'
+
+// 예시 재료 데이터 (추후 API로 대체 가능)
+const mockMaterials: Material[] = [
+  { id: '1', name: '당근', amount: '2개' },
+  { id: '2', name: '버터', amount: '30g' },
+  { id: '3', name: '설탕', amount: '2큰술' },
+  { id: '4', name: '간장', amount: '1큰술' },
+  { id: '5', name: '물', amount: '100ml' },
+]
 
 const VideoPage = () => {
   const { videoId } = useParams<{ videoId: string }>()
@@ -28,6 +39,7 @@ const VideoPage = () => {
   const [timerDuration, setTimerDuration] = useState(0)
   const [currentDialogue, setCurrentDialogue] = useState<Subtitle>(subtitles[0])
   const isRepeatModeRef = useRef(isRepeatMode)
+  const [materials, setMaterials] = useState<Material[]>(mockMaterials)
 
   const navigate = useNavigate()
   const playerRef = useRef<YouTubePlayerRef>(null)
@@ -159,19 +171,6 @@ const VideoPage = () => {
     })
   }
 
-  const handleSaveSubtitle = () => {
-    setFirstSaveDialogue(false)
-
-    if (isSaved && savedSubtitle) {
-      removeSubtitle(savedSubtitle.id)
-      setIsSentenceUpdated(false)
-
-      return
-    }
-    addSubtitle(videoId!, currentDialogue!)
-    setIsSentenceUpdated(true)
-  }
-
   //   const handleDialogueSaveGuide = async () => {
   //     playerRef.current?.pause()
   //     stopTimeTracking()
@@ -199,7 +198,7 @@ const VideoPage = () => {
     //     navigate(paths.my.sentences.getHref())
     //   },
     //   onCancel: () => {},
-    // })
+    // })=
   }
 
   const handleRepeatMode = (time: number) => {
@@ -277,7 +276,7 @@ const VideoPage = () => {
   }
 
   return (
-    <PageLayout title="버터 당근 조림" right={<BookmarkButton />}>
+    <PageLayout title="버터 당근 조림">
       <YouTubePlayer
         onStateChange={handleStateChange}
         ref={playerRef}
@@ -285,6 +284,8 @@ const VideoPage = () => {
         initialTime={0}
         disabled={isTimerRunning}
       />
+      <SubtitleProgressBar current={currentDialogue?.index ?? 0} total={subtitles.length} />
+      <MaterialAccordion materials={materials} />
 
       <div className="p-4">
         <TimerList
@@ -294,50 +295,7 @@ const VideoPage = () => {
         />
       </div>
 
-      {/* <div className="flex items-center gap-1 p-4">
-        <div className="flex gap-1">
-          <MaterialGuideButton />
-          <MaterialGuideButton />
-        </div>
-        <span className="text-gray-300">|</span>
-      </div> */}
-
       {currentDialogue && <VideoSubtitles data={currentDialogue} />}
-      {/* <SaveSubtitleButton
-          ref={saveButtonRef}
-          onClick={handleSaveSubtitle}
-          isSaved={isSaved}
-          showTooltip={isFirstSaveDialogue}
-        /> */}
-
-      {/* 타이머 리스트 */}
-
-      <VideoController
-        ref={videoControllerRef}
-        isPlaying={playerState === 1}
-        isRepeatMode={isRepeatMode}
-        togglePlay={handleTogglePlay}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        toggleRepeat={handleToggleRepeat}
-      />
-
-      {/* {subtitles.length > 0 && (
-        <div className="my-3">
-          <SubtitleCarousel
-            subtitles={subtitles}
-            currentIndex={subtitles.findIndex(s => s.index === currentDialogue?.index)}
-            onSelect={index => {
-              playerRef.current?.pause()
-              const selected = subtitles[index]
-              playerRef.current?.seekTo(selected.startTime)
-              setCurrentDialogue(selected)
-            }}
-            onTimerClick={handleOpenTimerBottomSheet}
-          />
-        </div>
-      )} */}
-      {/* <Toolbar /> */}
 
       <TimePickerBottomSheet
         open={isTimerBottomSheetOpened}
@@ -373,7 +331,5 @@ const getSubtitle = async (videoId: string): Promise<Subtitle[]> => {
     return defaultSubtitles
   }
 }
-
-// 기본 자막 (비디오 ID
 
 export default VideoPage
